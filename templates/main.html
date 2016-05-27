@@ -1,14 +1,61 @@
 <html>
 <head>
     <title>Sensibility Viz</title>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <style type="text/css">
+        body { 
+            margin:0; 
+            padding:0; 
+        }
+        #map { 
+            position:absolute; 
+            top:0; 
+            bottom:0; 
+            width:100%; 
+        }
 
+        #legend {
+            background-color: white;
+            position: absolute;
+            width: 220px;
+            height: 20px;
+            z-index: 1000;
+            top: 20;
+            right: 20;
+            border: solid black 0.5pt;
+            border-radius: 1em;
+            opacity: 0.6;
+            text-align: center;
+        }
+        #legend span,
+        #legend label {
+            display: inline-block;
+            width: 20px;
+            height: 100%;
+            line-height: 100%;
+            vertical-align: middle;
+        }
+
+        #legend label {
+            width: 40px;
+            text-align: left;
+            padding-left: 5px;
+            font-style: oblique;
+        }
+        
+
+
+    </style>
 </head>
 <body>
-<div id="mapid" style="height:600px"></div>
+<div id='legend'>
+
+</div>
+<div id="map"></div>
     <script type="text/javascript">
-        var mymap = L.map('mapid').setView([40.693511,-73.986207], 17);
+        var mymap = L.map('map').setView([40.693511,-73.986207], 17);
         L.tileLayer(
         'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
@@ -16,11 +63,38 @@
         }).addTo(mymap);
 
         var lines = JSON.parse({{ lines|tojson|safe }});
+        var line_colors = {
+            gps : "red",
+            nw :  "blue",
+            fused : "green"
+        };
 
-        for (var i = 0; i < lines.length; i++) {
-        	console.log(lines[i])
-        	L.polygon(lines[i], {color: 'red'}).addTo(mymap);
-        }
+
+        // Add lines
+        ["gps", "nw", "fused"].forEach(function(key){
+            var coords_prev = false;
+            lines[key].forEach(function(coords){
+                if (! coords_prev) {
+                    coords_prev = coords;
+                    return;
+                }
+                L.polygon([coords_prev, coords], {color: line_colors[key]}).addTo(mymap);
+                coords_prev = coords;
+            });
+        });
+
+        // Add legend items
+        ["gps", "nw", "fused"].forEach(function(key){
+            $("#legend").append($('<span>', {
+                css: {
+                    "background-color":line_colors[key]
+                }
+            }));
+            $("#legend").append($('<label>', {
+                    "text" : key
+            }));
+        }); 
+
     </script>
 
 </body>

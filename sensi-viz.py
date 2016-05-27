@@ -4,28 +4,22 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-  lines = []
+  lines_gps = []
+  lines_nw = []
+  lines_fused = []
 
-  with open("data/gps.csv") as f:
+  with open("data/loc.csv") as f:
     rd = csv.reader(f, delimiter=",")
+    for row in rd:
+      if row[0] == "gps":
+        lines_gps.append([float(row[6]), float(row[7])])
+      if row[0] == "nw":
+        lines_nw.append([float(row[6]), float(row[7])])
+      if row[0] == "fused":
+        lines_fused.append([float(row[6]), float(row[7])])
 
-    a = None
-    b = None
-    while True:
-      try:
-        b = rd.next()
-        if not a:
-          a = b
-          continue
-      except StopIteration:
-        break
-
-      lines.append([
-                  [float(a[6]), float(a[7])],
-                  [float(b[6]), float(b[7])]
-                  ])
-      a = b
-  return render_template('main.html', lines=json.dumps(lines))
-
+  return render_template('main.html', lines=json.dumps({"gps": lines_gps, 
+                                                        "nw" : lines_nw, 
+                                                        "fused": lines_fused}))
 if __name__ == "__main__":
     app.run()
