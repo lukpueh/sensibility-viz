@@ -1,0 +1,27 @@
+<html>
+<head>
+    <title>Sensibility Viz</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+
+</head>
+<body>
+<div id="mapid" style="height:600px"></div>
+    <script type="text/javascript">
+        var mymap = L.map('mapid').setView([40.693511,-73.986207], 17);
+        L.tileLayer(
+        'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' +
+                     'contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+        }).addTo(mymap);
+
+        var lines = JSON.parse({{ lines|tojson|safe }});
+
+        for (var i = 0; i < lines.length; i++) {
+        	console.log(lines[i])
+        	L.polygon(lines[i], {color: 'red'}).addTo(mymap);
+        }
+    </script>
+
+</body>
+</html>
