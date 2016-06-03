@@ -22,8 +22,8 @@
             width: 220px;
             height: 20px;
             z-index: 1000;
-            top: 20;
-            right: 20;
+            bottom: 20;
+            left: 20;
             border: solid black 0.5pt;
             border-radius: 1em;
             opacity: 0.6;
@@ -68,19 +68,27 @@
             fused : "green"
         };
 
-
+        var providers = ["gps", "nw", "fused"];
+        var controlLayers = L.control.layers();
         // Add lines
-        ["gps", "nw", "fused"].forEach(function(key){
+        providers.forEach(function(key){
+
+            var layerGroup = L.layerGroup();
             var coords_prev = false;
             lines[key].forEach(function(coords){
                 if (! coords_prev) {
                     coords_prev = coords;
                     return;
                 }
-                L.polygon([coords_prev, coords], {color: line_colors[key]}).addTo(mymap);
+                layerGroup.addLayer(L.polygon([coords_prev, coords], {color: line_colors[key], weight: 2})) ;
                 coords_prev = coords;
             });
+            layerGroup.addTo(mymap);
+            controlLayers.addOverlay(layerGroup, key);
+
         });
+
+        controlLayers.addTo(mymap);
 
         // Add legend items
         ["gps", "nw", "fused"].forEach(function(key){

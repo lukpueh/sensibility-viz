@@ -8,13 +8,14 @@ def hello():
   lines_nw = []
   lines_fused = []
 
-  with open("data/loc.csv") as f:
+  with open("data/locations_1464904913.56") as f:
     rd = csv.reader(f, delimiter=",")
     for row in rd:
       if row[0] == "gps":
         lines_gps.append([float(row[6]), float(row[7])])
-      if row[0] == "nw":
+      if row[0] == "network":
         lines_nw.append([float(row[6]), float(row[7])])
+
       if row[0] == "fused":
         lines_fused.append([float(row[6]), float(row[7])])
 
